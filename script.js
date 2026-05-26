@@ -1,35 +1,57 @@
-// complete the JS code
 const nameInput = document.getElementById("name");
 const scoreInput = document.getElementById("score");
 const scores = document.getElementById("scores");
 
-// Save score to Local Storage
+function getScores() {
+  return JSON.parse(localStorage.getItem("scores")) || [];
+}
+
+function setScores(list) {
+  localStorage.setItem("scores", JSON.stringify(list));
+}
+
 function saveScore() {
-  // complete the code here
-	 const name = nameInput.value.trim();
-  const score = scoreInput.value.trim();
+  const name = nameInput.value.trim();
+  const score = Number(scoreInput.value);
 
-  if (name === "" || score === "") return;
+  if (!name || scoreInput.value.trim() === "") return;
 
-  const savedScores = JSON.parse(localStorage.getItem("scores")) || [];
+  const savedScores = getScores();
   savedScores.push({ name, score });
+  savedScores.sort((a, b) => b.score - a.score);
 
-  localStorage.setItem("scores", JSON.stringify(savedScores));
+  setScores(savedScores);
 
   nameInput.value = "";
   scoreInput.value = "";
+
   showScores();
 }
 
-// Show scores in div
 function showScores() {
-  // complete the code
-	const savedScores = JSON.parse(localStorage.getItem("scores")) || [];
+  const savedScores = getScores().sort((a, b) => b.score - a.score);
 
-  scores.innerHTML = savedScores
-    .map((item) => `<p>${item.name}: ${item.score}</p>`)
-    .join("");
+  if (savedScores.length === 0) {
+    scores.innerHTML = "No scores yet";
+    return;
+  }
+
+  scores.innerHTML = `
+    <table>
+      <tbody>
+        ${savedScores
+          .map(
+            (item) => `
+              <tr>
+                <td>${item.name}</td>
+                <td>${item.score}</td>
+              </tr>
+            `
+          )
+          .join("")}
+      </tbody>
+    </table>
+  `;
 }
-
 
 showScores();
